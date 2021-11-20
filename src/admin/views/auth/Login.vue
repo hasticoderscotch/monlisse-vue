@@ -107,13 +107,18 @@ async function validateBeforeSubmit() {
 
   isLoading.value = true
   try {
-    await authStore.login(formData)
-    router.push('/admin/dashboard')
-    notificationStore.showNotification({
-      type: 'success',
-      message: 'Logged in successfully.',
+    await authStore.login(formData).then((res) => {
+      if (res) {
+        router.push('/admin/dashboard')
+        window.localStorage.setItem('token', res.data.token)
+
+        notificationStore.showNotification({
+          type: 'success',
+          message: 'Logged in successfully.',
+        })
+        isLoading.value = false
+      }
     })
-    isLoading.value = false
   } catch (error) {
     isLoading.value = false
   }

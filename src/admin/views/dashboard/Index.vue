@@ -1,3 +1,5 @@
 <template>
-  <div>dashboard</div>
+  <BasePage>
+    <BasePageHeader title="Dashboard" />
+  </BasePage>
 </template>
