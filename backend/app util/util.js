@@ -8,4 +8,8 @@ function generateToken(data, secret) {
   return jwt.sign(obj, secret, { expiresIn: '720hr' })
 }
 
-module.exports = { generateToken }
+function decodeToken(token) {
+  return jwt.decode(token)
+}
+
+module.exports = { generateToken, decodeToken }

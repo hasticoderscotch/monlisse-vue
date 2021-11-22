@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed top-0 left-0 w-full min-h-full">
+  <div class="fixed top-0 left-0 z-50 w-full">
     <Disclosure as="nav" class="bg-gray-800" v-slot="{ open }">
       <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
@@ -29,11 +29,22 @@
               <!-- Profile dropdown -->
               <div as="div" class="relative ml-3">
                 <div
-                  class="flex items-center max-w-xs text-sm font-medium text-gray-300 cursor-pointer  hover:text-white"
+                  class="
+                    flex
+                    items-center
+                    max-w-xs
+                    text-sm
+                    font-medium
+                    text-gray-300
+                    cursor-pointer
+                    hover:text-white
+                  "
                   @click.prevent="logout"
                 >
-                  <LogoutIcon class="h-5 mr-1" />
-                  Logout
+                  <span class="flex items-center">
+                    <LogoutIcon class="h-5 mr-1" />
+                    Logout
+                  </span>
                 </div>
               </div>
             </div>
@@ -41,7 +52,21 @@
           <div class="flex -mr-2 md:hidden">
             <!-- Mobile menu button -->
             <DisclosureButton
-              class="inline-flex items-center justify-center p-2 text-gray-400 bg-gray-800 rounded-md  hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+              class="
+                inline-flex
+                items-center
+                justify-center
+                p-2
+                text-gray-400
+                bg-gray-800
+                rounded-md
+                hover:text-white hover:bg-gray-700
+                focus:outline-none
+                focus:ring-2
+                focus:ring-offset-2
+                focus:ring-offset-gray-800
+                focus:ring-white
+              "
             >
               <span class="sr-only">Open main menu</span>
               <MenuIcon v-if="!open" class="block w-6 h-6" aria-hidden="true" />
@@ -71,11 +96,22 @@
         <div class="pt-4 pb-3 border-t border-gray-700">
           <div class="px-2 mt-3 space-y-1">
             <DisclosureButton
-              class="block px-3 py-2 text-base font-medium text-gray-300 rounded-md  hover:text-white hover:bg-gray-700"
+              class="
+                block
+                px-3
+                py-2
+                text-base
+                font-medium
+                text-gray-300
+                rounded-md
+                hover:text-white hover:bg-gray-700
+              "
               @click.prevent="logout"
             >
-              <LogoutIcon class="h-5" /> Logout</DisclosureButton
-            >
+              <span class="flex items-center">
+                <LogoutIcon class="h-5 mr-1" /> Logout
+              </span>
+            </DisclosureButton>
           </div>
         </div>
       </DisclosurePanel>

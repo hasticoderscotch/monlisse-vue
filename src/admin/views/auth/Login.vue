@@ -107,7 +107,7 @@ async function validateBeforeSubmit() {
 
   isLoading.value = true
   try {
-    await authStore.login(formData).then((res) => {
+    await authStore.login({ formData, role: 'admin' }).then((res) => {
       if (res) {
         router.push('/admin/dashboard')
         window.localStorage.setItem('token', res.data.token)

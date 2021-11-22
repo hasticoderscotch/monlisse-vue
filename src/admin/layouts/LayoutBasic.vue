@@ -4,7 +4,7 @@
 
     <SiteHeader />
 
-    <div class="flex h-screen pt-20 overflow-hidden">
+    <div class="flex h-screen pt-20 pb-10 overflow-hidden bg-gray-50">
       <router-view />
     </div>
   </div>
