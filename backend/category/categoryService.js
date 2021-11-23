@@ -7,7 +7,7 @@ async function addcategory(req, res) {
   return categorydao
     .create(data)
     .then(async (result) => {
-      res.json({ code: 201, message: 'Category Added' })
+      res.json({ code: 201, data: data, message: 'Category Added' })
     })
     .catch((err) => {
       console.log('createCategory -> err', err)

@@ -23,4 +23,9 @@
 
 <script setup>
 import { PlusIcon } from '@heroicons/vue/solid'
+import { useCategoryStore } from '../../../store/category'
+
+const categoryStore = useCategoryStore()
+
+categoryStore.fetchCategory()
 </script>

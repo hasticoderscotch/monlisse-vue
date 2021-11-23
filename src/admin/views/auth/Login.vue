@@ -73,6 +73,7 @@ const authStore = useAuthStore()
 const formData = reactive({
   email: '',
   password: '',
+  role: 'admin',
 })
 const isLoading = ref(false)
 
@@ -107,19 +108,28 @@ async function validateBeforeSubmit() {
 
   isLoading.value = true
   try {
-    await authStore.login({ formData, role: 'admin' }).then((res) => {
-      if (res) {
-        router.push('/admin/dashboard')
+    await authStore.login(formData).then((res) => {
+      if (res.data.code === 200) {
+        isLoading.value = false
         window.localStorage.setItem('token', res.data.token)
 
         notificationStore.showNotification({
           type: 'success',
           message: 'Logged in successfully.',
         })
-        isLoading.value = false
+        router.push('/admin/dashboard')
+      } else {
+        notificationStore.showNotification({
+          type: 'error',
+          message: res.data.message,
+        })
       }
     })
   } catch (error) {
+    notificationStore.showNotification({
+      type: 'error',
+      message: error.response.data.message,
+    })
     isLoading.value = false
   }
 }

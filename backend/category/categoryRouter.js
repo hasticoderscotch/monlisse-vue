@@ -2,17 +2,13 @@ const categoryRouter = require('express').Router()
 const actions = require('./categoryAction')
 const validate = require('./categoryValidator')
 
-categoryRouter
-  .route('/add')
-  .post([validate.verifyAdminToken], (req, res, next) => {
-    actions.addcategory(req, res, next)
-  })
+categoryRouter.route('/add').post([], (req, res, next) => {
+  actions.addcategory(req, res, next)
+})
 
-categoryRouter
-  .route('/list')
-  .get([validate.verifyAdminToken], (req, res, next) => {
-    actions.listcategory(req, res, next)
-  })
+categoryRouter.route('/list').get([], (req, res, next) => {
+  actions.listcategory(req, res, next)
+})
 
 categoryRouter
   .route('/update')

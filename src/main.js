@@ -14,6 +14,7 @@ import BasePage from './components/base/BasePage.vue'
 import BaseBreadcrumb from './components/base/BaseBreadcrumb.vue'
 import BaseBreadcrumbItem from './components/base/BaseBreadcrumbItem.vue'
 import BasePageHeader from './components/base/BasePageHeader.vue'
+import BaseTextarea from './components/base/BaseTextarea'
 
 const app = createApp(App)
 
@@ -26,6 +27,7 @@ app.component('BasePage', BasePage)
 app.component('BaseBreadcrumb', BaseBreadcrumb)
 app.component('BaseBreadcrumbItem', BaseBreadcrumbItem)
 app.component('BasePageHeader', BasePageHeader)
+app.component('BaseTextarea', BaseTextarea)
 
 app.use(router)
 app.use(createPinia())
