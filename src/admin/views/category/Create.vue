@@ -68,36 +68,81 @@ const pageTitle = computed(() =>
 
 // Methods
 
+if (isEdit.value) {
+  loadData()
+}
+
+async function loadData() {
+  await categoryStore.fetchCategory()
+
+  let res = categoryStore.categories.find((category) => {
+    if (category._id == route.params.id) {
+      return category
+    }
+  })
+
+  Object.assign(formData, res)
+}
+
 function submitData() {
   isLoading.value = true
+  if (isEdit.value) {
+    categoryStore
+      .updateCategory(route.params.id, formData)
+      .then((res) => {
+        if (res.data.data) {
+          isLoading.value = false
+          notificationStore.showNotification({
+            type: 'success',
+            message: 'Category updated successfully.',
+          })
+          router.push('/admin/categories')
+        } else {
+          notificationStore.showNotification({
+            type: 'error',
+            message: res.data.message,
+          })
+        }
+      })
+      .catch((err) => {
+        if (err) {
+          isLoading.value = false
 
-  categoryStore
-    .addCategory(formData)
-    .then((res) => {
-      if (res.data.data) {
-        isLoading.value = false
-        notificationStore.showNotification({
-          type: 'success',
-          message: 'Category created successfully.',
-        })
-        router.push('/admin/categories')
-      } else {
-        notificationStore.showNotification({
-          type: 'error',
-          message: res.data.message,
-        })
-      }
-    })
-    .catch((err) => {
-      if (err) {
-        isLoading.value = false
+          notificationStore.showNotification({
+            type: 'error',
+            message: err.response.data.message,
+          })
+        }
+      })
+  } else {
+    categoryStore
+      .addCategory(formData)
+      .then((res) => {
+        if (res.data.data) {
+          isLoading.value = false
+          notificationStore.showNotification({
+            type: 'success',
+            message: 'Category created successfully.',
+          })
+          router.push('/admin/categories')
+        } else {
+          notificationStore.showNotification({
+            type: 'error',
+            message: res.data.message,
+          })
+        }
+      })
+      .catch((err) => {
+        if (err) {
+          isLoading.value = false
 
-        notificationStore.showNotification({
-          type: 'error',
-          message: err.response.data.message,
-        })
-      }
-    })
+          notificationStore.showNotification({
+            type: 'error',
+            message: err.response.data.message,
+          })
+        }
+      })
+  }
 }
 
 console.log(pageTitle)

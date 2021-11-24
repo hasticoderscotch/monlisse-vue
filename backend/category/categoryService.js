@@ -19,7 +19,7 @@ async function listcategory(req, res) {
   categorydao
     .find()
     .then((data) => {
-      return res.json({ code: code.ok, data: data })
+      return res.json({ code: 200, data: data })
     })
     .catch((err) => {
       return res.json({
@@ -33,6 +33,7 @@ function updatecategory(req, res) {
   let query = { _id: req.query.categoryId },
     update = { $set: req.body },
     options = { new: true }
+
   categorydao
     .findOneAndUpdate(query, update, options)
     .then((data) => {
@@ -48,7 +49,6 @@ function updatecategory(req, res) {
 
 function deletecategory(req, res) {
   let query = { _id: req.query.categoryId }
-
   categorydao
     .remove(query)
     .then((data) => {

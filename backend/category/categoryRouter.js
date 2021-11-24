@@ -10,16 +10,12 @@ categoryRouter.route('/list').get([], (req, res, next) => {
   actions.listcategory(req, res, next)
 })
 
-categoryRouter
-  .route('/update')
-  .put([validate.verifyAdminToken], (req, res, next) => {
-    actions.updatesport(req, res, next)
-  })
+categoryRouter.route('/update').put([], (req, res, next) => {
+  actions.updatecategory(req, res, next)
+})
 
-categoryRouter
-  .route('/delete')
-  .delete([validate.verifyAdminToken], (req, res, next) => {
-    actions.deletesport(req, res, next)
-  })
+categoryRouter.route('/delete').delete([], (req, res, next) => {
+  actions.deletecategory(req, res, next)
+})
 
 module.exports = categoryRouter
