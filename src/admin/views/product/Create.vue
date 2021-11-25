@@ -11,7 +11,9 @@
     <div class="grid grid-cols-12">
       <div class="col-span-12 md:col-span-6">
         <form action="submit">
-          <BaseCard class="w-full mt-6"> </BaseCard>
+          <BaseCard class="w-full mt-6">
+            <BaseFileUpload />
+          </BaseCard>
         </form>
       </div>
     </div>
@@ -20,6 +22,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import BaseFileUpload from '../../../components/base/BaseFileUpload.vue'
 
 const route = useRoute()
 
