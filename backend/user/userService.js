@@ -28,10 +28,39 @@ async function loginAdmin(req, res) {
       )
       res.json({ code: 500, message: 'Internal server error' })
     })
-  // let tokn = util.generateToken(req.body, process.env.ADMIN_SECRET)
-  // return res.json({ code: 200, token: tokn })
+}
+
+function verifyToken(req, res, next) {
+  var token = req.headers.authorization.split(' ')[1]
+
+  if (!token) {
+    return res.json({
+      code: 400,
+      message: 'Token valid',
+      data: {},
+    })
+  } else {
+    util
+      .verifyAdminToken(token)
+      .then((result) => {
+        if (result) {
+          return res.json({ code: 200, message: 'Token valid' })
+        } else {
+          return res.json({
+            code: 500,
+            message: 'Internal server error',
+            err: err,
+          })
+        }
+      })
+      .catch((err) => {
+        console.log(err, 'err')
+        return res.json({ code: 401, message: 'Invalid Token' })
+      })
+  }
 }
 
 module.exports = {
   loginAdmin,
+  verifyToken,
 }

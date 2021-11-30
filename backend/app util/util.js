@@ -38,7 +38,7 @@ function generateToken(data, secret) {
     id: data._id,
     email: data.email,
   }
-  return jwt.sign(obj, secret, { expiresIn: '720hr' })
+  return jwt.sign(obj, secret, { expiresIn: '1hr' })
 }
 
 function decodeToken(token) {

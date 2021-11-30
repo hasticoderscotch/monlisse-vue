@@ -109,9 +109,8 @@ async function validateBeforeSubmit() {
   isLoading.value = true
   try {
     await authStore.login(formData).then((res) => {
-      if (res.data.code === 200) {
+      if (res.data) {
         isLoading.value = false
-        window.localStorage.setItem('token', res.data.token)
 
         notificationStore.showNotification({
           type: 'success',

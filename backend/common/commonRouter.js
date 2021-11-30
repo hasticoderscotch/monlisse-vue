@@ -1,7 +1,8 @@
 const commonRouter = require('express').Router()
 const service = require('./commonService')
+const express = require('express')
 
-commonRouter.route('/uploadPhoto').post([], (req, res) => {
+commonRouter.route('/upload').post([], (req, res) => {
   service.uploadPhoto(req, res)
 })
 

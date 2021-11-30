@@ -1,4 +1,16 @@
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from './store/auth'
+import App from './App.vue'
+
+const app = createApp(App)
+app.use(createPinia())
+
+const authStore = useAuthStore()
+
+// import auth from './middleware/auth'
+// import log from './middleware/log'
 
 // Admin
 
@@ -26,6 +38,7 @@ const routes = [
   {
     path: '/admin',
     component: AdminLayoutLogin,
+    meta: { redirectIfAuthenticated: true },
     children: [
       {
         path: 'login',
@@ -37,6 +50,7 @@ const routes = [
   {
     path: '/admin',
     component: AdminLayoutBasic,
+    meta: { requiresAuth: true },
     children: [
       // Dashboard
 
@@ -94,6 +108,32 @@ const router = createRouter({
   history: createWebHistory(),
   linkActiveClass: 'active',
   routes,
+})
+
+router.beforeEach((to, from, next) => {
+  console.log(authStore.token, 'authStore.isAuthenticated')
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    // this route requires auth, check if logged in
+    // if not, redirect to login page.
+    if (!authStore.token) {
+      next({
+        path: '/admin/login',
+      })
+    } else {
+      next()
+    }
+  } else {
+    next() // make sure to always call next()!
+  }
+
+  if (
+    to.matched.some((record) => record.meta.redirectIfAuthenticated) &&
+    authStore.token
+  ) {
+    next({
+      path: '/admin/dashboard',
+    })
+  }
 })
 
 export default router

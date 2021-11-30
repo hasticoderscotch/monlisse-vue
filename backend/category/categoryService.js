@@ -4,6 +4,7 @@ const util = require('../app util/util')
 
 async function addcategory(req, res) {
   const data = req.body
+
   return categorydao
     .create(data)
     .then(async (result) => {

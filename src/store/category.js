@@ -9,12 +9,25 @@ export const useCategoryStore = defineStore({
   }),
 
   actions: {
-    fetchCategory() {
+    fetchCategories() {
       return new Promise((resolve, reject) => {
         axios
           .get(`/category/list`)
           .then((response) => {
             this.categories = response.data.data
+            resolve(response)
+          })
+          .catch((err) => {
+            reject(err)
+          })
+      })
+    },
+
+    uploadImage(data) {
+      return new Promise((resolve, reject) => {
+        axios
+          .post('/upload', data)
+          .then((response) => {
             resolve(response)
           })
           .catch((err) => {

@@ -13,4 +13,17 @@
 <script setup>
 import SiteHeader from './partials/TheSiteHeader.vue'
 import NotificationRoot from '../../components/base/notification/NotificationRoot.vue'
+import { useAuthStore } from '../../store/auth'
+
+const authStore = useAuthStore()
+
+// Created
+
+token()
+
+// Method
+
+async function token() {
+  await authStore.verifyToken()
+}
 </script>

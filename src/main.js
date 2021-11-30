@@ -15,6 +15,9 @@ import BaseBreadcrumb from './components/base/BaseBreadcrumb.vue'
 import BaseBreadcrumbItem from './components/base/BaseBreadcrumbItem.vue'
 import BasePageHeader from './components/base/BasePageHeader.vue'
 import BaseTextarea from './components/base/BaseTextarea'
+import BaseFileUploader from './components/base/BaseFileUploader.vue'
+import BaseSwitch from './components/base/BaseSwitch.vue'
+import BaseSelectInput from './components/base/BaseSelectInput.vue'
 
 const app = createApp(App)
 
@@ -28,6 +31,9 @@ app.component('BaseBreadcrumb', BaseBreadcrumb)
 app.component('BaseBreadcrumbItem', BaseBreadcrumbItem)
 app.component('BasePageHeader', BasePageHeader)
 app.component('BaseTextarea', BaseTextarea)
+app.component('BaseFileUploader', BaseFileUploader)
+app.component('BaseSwitch', BaseSwitch)
+app.component('BaseSelectInput', BaseSelectInput)
 
 app.use(router)
 app.use(createPinia())

@@ -8,4 +8,8 @@ userRouter
     actions.loginAdmin(req, res, next)
   })
 
+userRouter.route('/verifyToken').get([], (req, res) => {
+  actions.verifyToken(req, res)
+})
+
 module.exports = userRouter

@@ -1,25 +1,27 @@
 const util = require('../app util/util')
+var multer = require('multer')
 
-function uploadPhoto(req, res) {
-  req.newFile_name = []
-  util.upload(req, res, async function (err) {
-    if (err) {
-      return res.json({ code: 400, message: err })
-    } else {
-      const files = req.files
-      let index, len
-      var filepathlist = []
-      for (index = 0, len = files.length; index < len; ++index) {
-        let filepath = process.env.IMAGEPREFIX + files[index].path.slice(4)
-        filepathlist.push(filepath)
-      }
-      return res.json({
-        code: 201,
-        data: filepathlist,
-      })
-    }
-  })
-}
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname)
+  },
+})
+
+var uploadPhoto = multer({ storage: storage })
+
+// app.use('/uploads', express.static('uploads'))
+
+// function uploadPhoto(req, res) {
+//   const { image } = req.body
+//   base64Img.img(image, './public', Date.now(), function (err, filepath) {
+//     const pathArr = filepath.split('/')
+//     const fileName = pathArr[pathArr.length - 1]
+//     res.json({ code: 200, url: fileName })
+//   })
+// }
 
 module.exports = {
   uploadPhoto,

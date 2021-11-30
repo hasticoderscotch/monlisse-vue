@@ -12,12 +12,45 @@
       <div class="col-span-12 md:col-span-6">
         <form action="" @submit.prevent="submitData">
           <BaseCard class="w-full mt-6">
-            <BaseInputGroup label="Name">
-              <BaseInput v-model="formData.name" />
+            <BaseInputGroup label="Category Image" required>
+              <div
+                class="w-full h-20 border-2 border-gray-300 border-dashed rounded  focus:border-primary-400"
+              >
+                <img :src="imageUrl" alt="" />
+                <input
+                  type="file"
+                  accept="image/*"
+                  @change="handleImage"
+                  class="flex p-4 item-center"
+                />
+              </div>
             </BaseInputGroup>
 
-            <BaseInputGroup label="Description" class="mt-4">
-              <BaseTextarea v-model="formData.description" />
+            <BaseInputGroup
+              label="Name"
+              class="my-4"
+              required
+              :error="v$.name.$error && v$.name.$errors[0].$message"
+            >
+              <BaseInput
+                v-model="formData.name"
+                :invalid="v$.name.$error"
+                @input="v$.name.$touch()"
+              />
+            </BaseInputGroup>
+
+            <BaseInputGroup
+              label="Description"
+              required
+              :error="
+                v$.description.$error && v$.description.$errors[0].$message
+              "
+            >
+              <BaseTextarea
+                v-model="formData.description"
+                :invalid="v$.description.$error"
+                @input="v$.description.$touch()"
+              />
             </BaseInputGroup>
 
             <BaseButton type="submit" :loading="isLoading" class="mt-6 mb-6">
@@ -38,6 +71,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { useCategoryStore } from '../../../store/category'
 import { useNotificationStore } from '../../../store/notification'
 import { SaveIcon } from '@heroicons/vue/outline'
+import { required, maxLength, helpers } from '@vuelidate/validators'
+import useVuelidate from '@vuelidate/core'
 
 // Local State
 
@@ -47,6 +82,9 @@ let formData = reactive({
 })
 
 const isLoading = ref(false)
+// let imageFileBlob = ref(null)
+let imageUrl = ref('')
+const selectedImage = ref('')
 
 // Store
 
@@ -66,29 +104,96 @@ const pageTitle = computed(() =>
   isEdit.value ? 'Edit Category' : 'New Category'
 )
 
+// Validation
+
+const rules = computed(() => {
+  return {
+    name: {
+      required: helpers.withMessage('Field is required', required),
+    },
+
+    description: {
+      required: helpers.withMessage('Field is required', required),
+      maxLength: helpers.withMessage(
+        'Description should not be greater than 255 characters.',
+        maxLength(65000)
+      ),
+    },
+  }
+})
+
+const v$ = useVuelidate(rules, formData)
+
 // Methods
+
+// function onFileInputChange(fileName, file) {
+//   imageFileBlob.value = file
+// }
+
+// function onFileInputRemove() {
+//   imageFileBlob.value = null
+// }
+
+function handleImage(e) {
+  selectedImage.value = e.target.files[0]
+}
+
+// function createBase64Image(fileObject) {
+//   const reader = new FileReader()
+
+//   reader.onload = (e) => {
+//     console.log(e.target, 'e')
+//     imageUrl.value = e.target.result
+//   }
+//   reader.readAsBinaryString(fileObject)
+// }
 
 if (isEdit.value) {
   loadData()
 }
 
 async function loadData() {
-  await categoryStore.fetchCategory()
+  await categoryStore.fetchCategories()
 
   let res = categoryStore.categories.find((category) => {
     if (category._id == route.params.id) {
       return category
     }
   })
-
   Object.assign(formData, res)
 }
 
-function submitData() {
+async function submitData() {
+  v$.value.$touch()
+
+  if (v$.value.$invalid) {
+    return true
+  }
+
+  let data = {
+    name: formData.name,
+    description: formData.description,
+  }
+
+  const imgData = new FormData()
+
+  if (selectedImage.value) {
+    imgData.append('image', selectedImage.value)
+    await categoryStore.uploadImage({ imgData })
+  }
+
+  // if (imageFileBlob.value) {
+  //   data.append('image', imageFileBlob.value)
+  // }
+
+  // data.append('name', formData.name)
+  // data.append('description', formData.description)
+
   isLoading.value = true
+
   if (isEdit.value) {
-    categoryStore
-      .updateCategory(route.params.id, formData)
+    await categoryStore
+      .updateCategory(route.params.id, data)
       .then((res) => {
         if (res.data.data) {
           isLoading.value = false
@@ -115,8 +220,8 @@ function submitData() {
         }
       })
   } else {
-    categoryStore
-      .addCategory(formData)
+    await categoryStore
+      .addCategory(data)
       .then((res) => {
         if (res.data.data) {
           isLoading.value = false

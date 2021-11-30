@@ -19,7 +19,7 @@
       </template>
     </BasePageHeader>
 
-    <div class="flex flex-col">
+    <div v-if="categoryStore.categories.length" class="flex flex-col">
       <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
           <div
@@ -91,6 +91,27 @@
         </div>
       </div>
     </div>
+    <div
+      v-else
+      class="flex flex-col items-center justify-center p-5 mt-20 bg-white rounded "
+    >
+      <div class="mt-2">
+        <label class="font-medium">No Categories yet!</label>
+      </div>
+      <div class="mt-2">
+        <label class="text-gray-500">
+          This section will contain the list of categories .
+        </label>
+      </div>
+      <div class="mt-6">
+        <BaseButton @click="$router.push('/admin/categories/create')">
+          <template #left="slotProps">
+            <PlusIcon :class="slotProps.class" />
+          </template>
+          Create Category
+        </BaseButton>
+      </div>
+    </div>
   </BasePage>
 </template>
 
@@ -106,7 +127,7 @@ const categoryStore = useCategoryStore()
 const notificationStore = useNotificationStore()
 const dialogStore = useDialogStore()
 
-categoryStore.fetchCategory()
+categoryStore.fetchCategories()
 
 function removeCategory(id) {
   dialogStore
@@ -128,6 +149,11 @@ function removeCategory(id) {
               message: 'Category deleted successfully',
             })
             return true
+          } else {
+            notificationStore.showNotification({
+              type: 'error',
+              message: res.data.message,
+            })
           }
           return true
         })

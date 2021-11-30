@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed top-0 left-0 w-full">
+  <div class="fixed top-0 left-0 z-20 w-full">
     <Disclosure as="nav" class="bg-gray-800" v-slot="{ open }">
       <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
@@ -18,9 +18,9 @@
                   :key="item.name"
                   :to="item.route"
                   :class="activeClass(item.route)"
-                  :aria-current="item.current ? 'page' : undefined"
-                  >{{ item.name }}</router-link
                 >
+                  {{ item.name }}
+                </router-link>
               </div>
             </div>
           </div>
@@ -55,20 +55,17 @@
 
       <DisclosurePanel class="md:hidden">
         <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          <DisclosureButton
+          <router-link
             v-for="item in navigation"
             :key="item.name"
-            as="router-link"
             :to="item.route"
             :class="[
-              item.current
-                ? 'bg-gray-900 text-white'
-                : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+              activeClass(item.route),
               'block px-3 py-2 rounded-md text-base font-medium',
             ]"
-            :aria-current="item.current ? 'page' : undefined"
-            >{{ item.name }}</DisclosureButton
           >
+            {{ item.name }}
+          </router-link>
         </div>
         <div class="pt-4 pb-3 border-t border-gray-700">
           <div class="px-2 mt-3 space-y-1">
