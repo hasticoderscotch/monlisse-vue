@@ -7,7 +7,7 @@ module.exports = function (app) {
   app.use('/user', userRouter)
   app.use('/category', categoryRouter)
   app.use('/product', productRouter)
-  app.use('/', commonRouter)
+  app.use('/common', commonRouter)
   app.use('/test', (req, res) => {
     return res.json({ msg: 'Test api response' })
   })

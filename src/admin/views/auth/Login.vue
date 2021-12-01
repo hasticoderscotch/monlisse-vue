@@ -111,12 +111,11 @@ async function validateBeforeSubmit() {
     await authStore.login(formData).then((res) => {
       if (res.data) {
         isLoading.value = false
-
+        router.push('/admin/dashboard')
         notificationStore.showNotification({
           type: 'success',
           message: 'Logged in successfully.',
         })
-        router.push('/admin/dashboard')
       } else {
         notificationStore.showNotification({
           type: 'error',

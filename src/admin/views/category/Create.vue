@@ -10,7 +10,11 @@
 
     <div class="grid grid-cols-12">
       <div class="col-span-12 md:col-span-6">
-        <form action="" @submit.prevent="submitData">
+        <form
+          action=""
+          enctype="multipart/form-data"
+          @submit.prevent="submitData"
+        >
           <BaseCard class="w-full mt-6">
             <BaseInputGroup label="Category Image" required>
               <div
@@ -19,9 +23,8 @@
                 <img :src="imageUrl" alt="" />
                 <input
                   type="file"
-                  accept="image/*"
-                  @change="handleImage"
                   class="flex p-4 item-center"
+                  @change="handleImage"
                 />
               </div>
             </BaseInputGroup>
@@ -65,11 +68,13 @@
     </div>
   </BasePage>
 </template>
+
 <script setup>
 import { computed, reactive, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+// useRouter
+import { useRoute } from 'vue-router'
 import { useCategoryStore } from '../../../store/category'
-import { useNotificationStore } from '../../../store/notification'
+// import { useNotificationStore } from '../../../store/notification'
 import { SaveIcon } from '@heroicons/vue/outline'
 import { required, maxLength, helpers } from '@vuelidate/validators'
 import useVuelidate from '@vuelidate/core'
@@ -81,20 +86,19 @@ let formData = reactive({
   description: '',
 })
 
+const imagepath = ref('')
+const imageUrl = ref('')
 const isLoading = ref(false)
-// let imageFileBlob = ref(null)
-let imageUrl = ref('')
-const selectedImage = ref('')
 
 // Store
 
 const categoryStore = useCategoryStore()
-const notificationStore = useNotificationStore()
+// const notificationStore = useNotificationStore()
 
 // Router
 
 const route = useRoute()
-const router = useRouter()
+// const router = useRouter()
 
 // Computed
 
@@ -126,27 +130,9 @@ const v$ = useVuelidate(rules, formData)
 
 // Methods
 
-// function onFileInputChange(fileName, file) {
-//   imageFileBlob.value = file
-// }
-
-// function onFileInputRemove() {
-//   imageFileBlob.value = null
-// }
-
 function handleImage(e) {
-  selectedImage.value = e.target.files[0]
+  imagepath.value = e.target.files[0]
 }
-
-// function createBase64Image(fileObject) {
-//   const reader = new FileReader()
-
-//   reader.onload = (e) => {
-//     console.log(e.target, 'e')
-//     imageUrl.value = e.target.result
-//   }
-//   reader.readAsBinaryString(fileObject)
-// }
 
 if (isEdit.value) {
   loadData()
@@ -160,6 +146,9 @@ async function loadData() {
       return category
     }
   })
+
+  imageUrl.value = res?.image
+
   Object.assign(formData, res)
 }
 
@@ -170,84 +159,75 @@ async function submitData() {
     return true
   }
 
-  let data = {
-    name: formData.name,
-    description: formData.description,
-  }
-
-  const imgData = new FormData()
-
-  if (selectedImage.value) {
-    imgData.append('image', selectedImage.value)
-    await categoryStore.uploadImage({ imgData })
-  }
-
-  // if (imageFileBlob.value) {
-  //   data.append('image', imageFileBlob.value)
+  // let data = {
+  //   name: formData.name,
+  //   description: formData.description,
+  //   ...imgData,
   // }
 
-  // data.append('name', formData.name)
-  // data.append('description', formData.description)
+  const imgData = new FormData()
+  imgData.append('categoryImage', imagepath.value)
+  await categoryStore.uploadImage(imgData)
 
   isLoading.value = true
 
-  if (isEdit.value) {
-    await categoryStore
-      .updateCategory(route.params.id, data)
-      .then((res) => {
-        if (res.data.data) {
-          isLoading.value = false
-          notificationStore.showNotification({
-            type: 'success',
-            message: 'Category updated successfully.',
-          })
-          router.push('/admin/categories')
-        } else {
-          notificationStore.showNotification({
-            type: 'error',
-            message: res.data.message,
-          })
-        }
-      })
-      .catch((err) => {
-        if (err) {
-          isLoading.value = false
+  // if (isEdit.value) {
+  //   await categoryStore
+  //     .updateCategory(route.params.id, data)
+  //     .then((res) => {
+  //       if (res.data.data) {
+  //         isLoading.value = false
+  //         notificationStore.showNotification({
+  //           type: 'success',
+  //           message: 'Category updated successfully.',
+  //         })
+  //         router.push('/admin/categories')
+  //       } else {
+  //         notificationStore.showNotification({
+  //           type: 'error',
+  //           message: res.data.message,
+  //         })
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       if (err) {
+  //         isLoading.value = false
 
-          notificationStore.showNotification({
-            type: 'error',
-            message: err.response.data.message,
-          })
-        }
-      })
-  } else {
-    await categoryStore
-      .addCategory(data)
-      .then((res) => {
-        if (res.data.data) {
-          isLoading.value = false
-          notificationStore.showNotification({
-            type: 'success',
-            message: 'Category created successfully.',
-          })
-          router.push('/admin/categories')
-        } else {
-          notificationStore.showNotification({
-            type: 'error',
-            message: res.data.message,
-          })
-        }
-      })
-      .catch((err) => {
-        if (err) {
-          isLoading.value = false
+  //         notificationStore.showNotification({
+  //           type: 'error',
+  //           message: err.response.data.message,
+  //         })
+  //       }
+  //     })
+  // } else {
+  //   await categoryStore
+  //     .addCategory(data)
+  //     .then((res) => {
+  //       if (res.data.data) {
+  //         isLoading.value = false
+  //         notificationStore.showNotification({
+  //           type: 'success',
+  //           message: 'Category created successfully.',
+  //         })
+  //         router.push('/admin/categories')
+  //       } else {
+  //         notificationStore.showNotification({
+  //           type: 'error',
+  //           message: res.data.message,
+  //         })
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       if (err) {
+  //         isLoading.value = false
 
-          notificationStore.showNotification({
-            type: 'error',
-            message: err.response.data.message,
-          })
-        }
-      })
-  }
+  //         notificationStore.showNotification({
+  //           type: 'error',
+  //           message: err.response.data.message,
+  //         })
+  //       }
+  //     })
+  // }
 }
 
 console.log(pageTitle)

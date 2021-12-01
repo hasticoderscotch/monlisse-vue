@@ -87,6 +87,7 @@
 <script setup>
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
 import { MenuIcon, XIcon, LogoutIcon } from '@heroicons/vue/outline'
+import Ls from '../../../services/ls'
 
 import { useRoute, useRouter } from 'vue-router'
 
@@ -110,7 +111,7 @@ function activeClass(url) {
 }
 
 function logout() {
-  window.localStorage.removeItem('token')
+  Ls.remove('token')
   router.push('/admin/login')
 }
 </script>

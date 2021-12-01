@@ -1,17 +1,18 @@
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { defineStore } from 'pinia'
+import Ls from '../services/ls'
 
 export const useAuthStore = defineStore({
   id: 'auth',
 
   state: () => ({
-    token: window.localStorage.getItem('token'),
+    token: Ls.get('token'),
     verify: false,
   }),
 
   getters: {
-    isAuthenticated: (state) => state.token,
+    isAuthenticated: (state) => !!state.token,
     isVerifyToken: (state) => state.verify,
   },
 
@@ -22,11 +23,11 @@ export const useAuthStore = defineStore({
           .post('/user/loginAdmin', data)
           .then((response) => {
             this.token = response.data.token
-            window.localStorage.setItem('token', this.token)
+            Ls.set('token', this.token)
             resolve(response)
           })
           .catch((err) => {
-            window.localStorage.removeItem('token')
+            Ls.removeItem('token')
             reject(err)
           })
       })
@@ -39,13 +40,13 @@ export const useAuthStore = defineStore({
           .get('/user/verifyToken')
           .then((response) => {
             if (response.data.code !== 200) {
-              window.localStorage.removeItem('token')
+              Ls.remove('token')
               router.push('/admin/login')
             }
             resolve(response)
           })
           .catch((err) => {
-            window.localStorage.removeItem('token')
+            Ls.remove('token')
             router.push('/admin/login')
             reject(err)
           })

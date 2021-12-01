@@ -9,9 +9,6 @@ app.use(createPinia())
 
 const authStore = useAuthStore()
 
-// import auth from './middleware/auth'
-// import log from './middleware/log'
-
 // Admin
 
 const AdminLayoutLogin = () => import('./admin/layouts/LayoutLogin.vue')
@@ -111,11 +108,11 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  console.log(authStore.token, 'authStore.isAuthenticated')
+  console.log(authStore.isAuthenticated, 'authStore.isAuthenticated')
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     // this route requires auth, check if logged in
     // if not, redirect to login page.
-    if (!authStore.token) {
+    if (!authStore.isAuthenticated) {
       next({
         path: '/admin/login',
       })
@@ -128,7 +125,7 @@ router.beforeEach((to, from, next) => {
 
   if (
     to.matched.some((record) => record.meta.redirectIfAuthenticated) &&
-    authStore.token
+    authStore.isAuthenticated
   ) {
     next({
       path: '/admin/dashboard',

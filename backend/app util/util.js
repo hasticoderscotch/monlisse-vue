@@ -2,24 +2,44 @@ const jwt = require('jsonwebtoken')
 var path = require('path')
 var multer = require('multer')
 
-var storage = multer.diskStorage({
-  destination: function (req, file, callback) {
-    callback(null, './img')
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './img')
   },
-  filename: function (req, file, callback) {
-    let file_name =
-      file.fieldname + '-' + Date.now() + path.extname(file.originalname)
-    req.newFile_name.push(file_name)
-    callback(null, file_name)
+  filename: function (req, file, cb) {
+    cb(null, new Date().toISOString() + path.extname(file.originalname))
   },
 })
 
+const fileFilter = (req, file, cb) => {
+  // reject a file
+  if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+    cb(null, true)
+  } else {
+    cb(null, false)
+  }
+}
+
 var upload = multer({
   storage: storage,
-  fileFilter: function (req, file, callback) {
-    checkFileType(file, callback)
+  limits: {
+    fileSize: 1024 * 1024 * 50,
   },
-}).array('img', 5)
+  fileFilter: fileFilter,
+})
+
+// var Storage = multer.diskStorage({
+//   destination: function (req, file, callback) {
+//     callback(null, '../../public')
+//   },
+//   filename: function (req, file, callback) {
+//     callback(null, file.fieldname + '_' + Date.now() + '_' + file.originalname)
+//   },
+// })
+
+// var upload = multer({
+//   storage: Storage,
+// }).array('image', 3) //Field name and max count
 
 function checkFileType(file, callback) {
   const fileTypes = /jpeg|jpg|png|gif|svg/
