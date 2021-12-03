@@ -17,16 +17,10 @@
         >
           <BaseCard class="w-full mt-6">
             <BaseInputGroup label="Category Image" required>
-              <div
-                class="w-full h-20 border-2 border-gray-300 border-dashed rounded  focus:border-primary-400"
-              >
-                <img :src="imageUrl" alt="" />
-                <input
-                  type="file"
-                  class="flex p-4 item-center"
-                  @change="handleImage"
-                />
-              </div>
+              <BaseFileUploader
+                :preview-image="imageUrl"
+                @change="onFileInputChange"
+              />
             </BaseInputGroup>
 
             <BaseInputGroup
@@ -71,10 +65,9 @@
 
 <script setup>
 import { computed, reactive, ref } from 'vue'
-// useRouter
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useCategoryStore } from '../../../store/category'
-// import { useNotificationStore } from '../../../store/notification'
+import { useNotificationStore } from '../../../store/notification'
 import { SaveIcon } from '@heroicons/vue/outline'
 import { required, maxLength, helpers } from '@vuelidate/validators'
 import useVuelidate from '@vuelidate/core'
@@ -86,19 +79,19 @@ let formData = reactive({
   description: '',
 })
 
-const imagepath = ref('')
-const imageUrl = ref('')
+let imageFileBlob = ref(null)
+let imageUrl = ref('')
 const isLoading = ref(false)
 
 // Store
 
 const categoryStore = useCategoryStore()
-// const notificationStore = useNotificationStore()
+const notificationStore = useNotificationStore()
 
 // Router
 
 const route = useRoute()
-// const router = useRouter()
+const router = useRouter()
 
 // Computed
 
@@ -130,8 +123,8 @@ const v$ = useVuelidate(rules, formData)
 
 // Methods
 
-function handleImage(e) {
-  imagepath.value = e.target.files[0]
+function onFileInputChange(fileName, file) {
+  imageFileBlob.value = file
 }
 
 if (isEdit.value) {
@@ -146,8 +139,9 @@ async function loadData() {
       return category
     }
   })
-
-  imageUrl.value = res?.image
+  var path = res?.image
+  imageUrl.value = path.replace(/\\/g, '/')
+  console.log(imageUrl.value, '  imageUrl.value')
 
   Object.assign(formData, res)
 }
@@ -159,75 +153,82 @@ async function submitData() {
     return true
   }
 
-  // let data = {
-  //   name: formData.name,
-  //   description: formData.description,
-  //   ...imgData,
-  // }
-
+  // Upload image
   const imgData = new FormData()
-  imgData.append('categoryImage', imagepath.value)
-  await categoryStore.uploadImage(imgData)
+
+  imgData.append('categoryImage', imageFileBlob.value)
+
+  await categoryStore.uploadCategoryImage(imgData).then((res) => {
+    imageUrl.value = res.data.data.path
+  })
+
+  // Category actions
 
   isLoading.value = true
 
-  // if (isEdit.value) {
-  //   await categoryStore
-  //     .updateCategory(route.params.id, data)
-  //     .then((res) => {
-  //       if (res.data.data) {
-  //         isLoading.value = false
-  //         notificationStore.showNotification({
-  //           type: 'success',
-  //           message: 'Category updated successfully.',
-  //         })
-  //         router.push('/admin/categories')
-  //       } else {
-  //         notificationStore.showNotification({
-  //           type: 'error',
-  //           message: res.data.message,
-  //         })
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       if (err) {
-  //         isLoading.value = false
+  let data = {
+    name: formData.name,
+    description: formData.description,
+    image: imageUrl.value,
+  }
 
-  //         notificationStore.showNotification({
-  //           type: 'error',
-  //           message: err.response.data.message,
-  //         })
-  //       }
-  //     })
-  // } else {
-  //   await categoryStore
-  //     .addCategory(data)
-  //     .then((res) => {
-  //       if (res.data.data) {
-  //         isLoading.value = false
-  //         notificationStore.showNotification({
-  //           type: 'success',
-  //           message: 'Category created successfully.',
-  //         })
-  //         router.push('/admin/categories')
-  //       } else {
-  //         notificationStore.showNotification({
-  //           type: 'error',
-  //           message: res.data.message,
-  //         })
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       if (err) {
-  //         isLoading.value = false
+  if (isEdit.value) {
+    await categoryStore
+      .updateCategory(route.params.id, data)
+      .then((res) => {
+        if (res.data.data) {
+          isLoading.value = false
+          notificationStore.showNotification({
+            type: 'success',
+            message: 'Category updated successfully.',
+          })
+          router.push('/admin/categories')
+        } else {
+          notificationStore.showNotification({
+            type: 'error',
+            message: res.data.message,
+          })
+        }
+      })
+      .catch((err) => {
+        if (err) {
+          isLoading.value = false
 
-  //         notificationStore.showNotification({
-  //           type: 'error',
-  //           message: err.response.data.message,
-  //         })
-  //       }
-  //     })
-  // }
+          notificationStore.showNotification({
+            type: 'error',
+            message: err.response.data.message,
+          })
+        }
+      })
+  } else {
+    await categoryStore
+      .addCategory(data)
+      .then((res) => {
+        if (res.data.data) {
+          isLoading.value = false
+          notificationStore.showNotification({
+            type: 'success',
+            message: 'Category created successfully.',
+          })
+          router.push('/admin/categories')
+        } else {
+          notificationStore.showNotification({
+            type: 'error',
+            message: res.data.message,
+          })
+        }
+      })
+      .catch((err) => {
+        if (err) {
+          isLoading.value = false
+
+          notificationStore.showNotification({
+            type: 'error',
+            message: err.response.data.message,
+          })
+        }
+      })
+  }
 }
 
 console.log(pageTitle)

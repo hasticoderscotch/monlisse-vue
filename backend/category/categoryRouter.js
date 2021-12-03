@@ -5,15 +5,9 @@ const util = require('../app util/util')
 
 categoryRouter
   .route('/add')
-  .post(
-    [validate.verifyAdminToken, util.upload.single('image')],
-    (req, res, next) => {
-      if (!req.image) return res.send('Please upload a file')
-      var tempPath = req.image.path
-      console.log(tempPath)
-      actions.addcategory(req, res, next)
-    }
-  )
+  .post([validate.verifyAdminToken], (req, res, next) => {
+    actions.addcategory(req, res, next)
+  })
 
 categoryRouter
   .route('/list')

@@ -21,7 +21,7 @@ mongoose.connect(
   }
 )
 
-app.use(express.static('./public'))
+app.use(express.static('./img'))
 require('./router')(app)
 
 const port = process.env.PORT

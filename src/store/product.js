@@ -23,6 +23,19 @@ export const useProductStore = defineStore({
       })
     },
 
+    uploadProductImages(data) {
+      return new Promise((resolve, reject) => {
+        axios
+          .post('/common/product-upload', data)
+          .then((response) => {
+            resolve(response)
+          })
+          .catch((err) => {
+            reject(err)
+          })
+      })
+    },
+
     addProduct(data) {
       return new Promise((resolve, reject) => {
         axios

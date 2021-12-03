@@ -23,10 +23,10 @@ export const useCategoryStore = defineStore({
       })
     },
 
-    uploadImage(data) {
+    uploadCategoryImage(data) {
       return new Promise((resolve, reject) => {
         axios
-          .post('/common/upload', data)
+          .post('/common/category-upload', data)
           .then((response) => {
             resolve(response)
           })

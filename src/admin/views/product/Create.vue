@@ -13,40 +13,104 @@
         <form action="submit" @submit.prevent="submitData">
           <BaseCard class="w-full mt-6">
             <BaseInputGroup label="Product Images">
-              <BaseFileUploader />
+              <BaseFileUploader
+                :preview-image="productImagesUrls"
+                multiple
+                @change="onFileInputChange"
+              />
             </BaseInputGroup>
 
-            <BaseInputGroup label="Name" class="my-4">
-              <BaseInput v-model="formData.name" @input="slug" />
+            <BaseInputGroup
+              label="Name"
+              required
+              class="my-4"
+              :error="v$.name.$error && v$.name.$errors[0].$message"
+            >
+              <BaseInput
+                v-model="formData.name"
+                :invalid="v$.name.$error"
+                @input="slug"
+              />
             </BaseInputGroup>
 
-            <BaseInputGroup label="Title">
-              <BaseInput v-model="formData.title" />
+            <BaseInputGroup
+              label="Title"
+              required
+              :error="v$.title.$error && v$.title.$errors[0].$message"
+            >
+              <BaseInput
+                v-model="formData.title"
+                :invalid="v$.title.$error"
+                @input="v$.title.$touch()"
+              />
             </BaseInputGroup>
 
-            <BaseInputGroup label="Description" class="my-4">
-              <BaseTextarea v-model="formData.description" />
+            <BaseInputGroup
+              label="Description"
+              class="my-4"
+              required
+              :error="
+                v$.description.$error && v$.description.$errors[0].$message
+              "
+            >
+              <BaseTextarea
+                v-model="formData.description"
+                :invalid="v$.description.$error"
+                @input="v$.description.$touch()"
+              />
             </BaseInputGroup>
 
-            <BaseInputGroup label="Select Category">
+            <BaseInputGroup
+              label="Select Category"
+              required
+              :error="v$.categoryId.$error && v$.categoryId.$errors[0].$message"
+            >
               <BaseSelectInput
                 v-model="formData.categoryId"
                 :options="categoryStore.categories"
                 label-key="name"
                 value-prop="_id"
+                :invalid="v$.categoryId.$error"
+                @input="v$.categoryId.$touch()"
               />
             </BaseInputGroup>
 
-            <BaseInputGroup label="Quantity" class="my-4">
-              <BaseInput v-model="formData.quantity" />
+            <BaseInputGroup
+              label="Quantity"
+              class="my-4"
+              required
+              :error="v$.quantity.$error && v$.quantity.$errors[0].$message"
+            >
+              <BaseInput
+                v-model="formData.quantity"
+                :invalid="v$.quantity.$error"
+                @input="v$.quantity.$touch()"
+              />
             </BaseInputGroup>
 
-            <BaseInputGroup label="Price">
-              <BaseInput v-model="formData.price" />
+            <BaseInputGroup
+              label="Price"
+              required
+              :error="v$.price.$error && v$.price.$errors[0].$message"
+            >
+              <BaseInput
+                v-model="formData.price"
+                :invalid="v$.price.$error"
+                @input="v$.price.$touch()"
+              />
             </BaseInputGroup>
 
-            <BaseInputGroup label="isActive" class="my-4">
-              <BaseSwitch v-model="formData.isActive" />
+            <BaseInputGroup
+              label="isActive"
+              required
+              :error="v$.isActive.$error && v$.isActive.$errors[0].$message"
+              class="my-4"
+            >
+              <BaseSwitch
+                v-model="formData.isActive"
+                :invalid="v$.isActive.$error"
+                @input="v$.isActive.$touch()"
+              />
             </BaseInputGroup>
 
             <BaseButton type="submit" :loading="isLoading" class="mt-6 mb-6">
@@ -83,6 +147,9 @@ let formData = reactive({
   slug: null,
   isActive: false,
 })
+
+let productImagesUrls = reactive([])
+let imageFileBlobs = reactive([])
 
 const isLoading = ref(false)
 
@@ -151,6 +218,12 @@ const v$ = useVuelidate(rules, formData)
 
 // Methods
 
+function onFileInputChange(fileName, fileList) {
+  imageFileBlobs = fileList
+
+  console.log(imageFileBlobs, 'imagefileblob')
+}
+
 if (isEdit.value) {
   loadData()
 }
@@ -169,30 +242,40 @@ async function loadData() {
 
 function slug(e) {
   const a = e.target.value
-  console.log(a, 'a')
-
   const b = a
     .toLowerCase()
     .replace(/ /g, '-')
     .replace(/[^\w-]+/g, '')
-
   formData.slug = b
-
-  console.log(formData.slug, 'formData.slug')
+  v$.value.name.$touch()
 }
 
-function submitData() {
+async function submitData() {
   v$.value.$touch()
 
   if (v$.value.$invalid) {
     return true
   }
 
-  let data = {
-    ...formData,
+  // Upload image
+  const imgData = new FormData()
+
+  for (const i of Object.keys(imageFileBlobs)) {
+    imgData.append('productImages', imageFileBlobs[i])
   }
 
+  await productStore.uploadProductImages(imgData).then((res) => {
+    for (const i of Object.keys(res.data.data)) {
+      productImagesUrls.push(res.data.data[i].path)
+    }
+  })
+
   isLoading.value = true
+
+  let data = {
+    ...formData,
+    productImages: productImagesUrls,
+  }
 
   if (isEdit.value) {
     productStore

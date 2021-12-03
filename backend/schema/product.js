@@ -8,7 +8,7 @@ var productSchema = new schema({
   price: { type: Number },
   isActive: { type: Boolean },
   slug: { type: String },
-  images: { type: Array },
+  productImages: { type: Array },
   quantity: { type: Number },
   categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'category' },
 })
